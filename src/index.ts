@@ -48,6 +48,8 @@ export class Game {
         this.places[this.currentPlayer] = this.places[this.currentPlayer] + roll;
         if (this.places[this.currentPlayer] > 11) {
           this.places[this.currentPlayer] = this.places[this.currentPlayer] - 12;
+
+          console.log(`Player ${this.players[this.currentPlayer]} has completed a turn out of penalty box`);
         }
 
         console.log(`Player ${this.players[this.currentPlayer]} is moved to ${this.places[this.currentPlayer]}`);
@@ -56,11 +58,14 @@ export class Game {
       } else {
         this.isGettingOutOfPenaltyBox = false;
         console.log(`Player ${this.players[this.currentPlayer]} is not getting out of penalty box`);
+        console.log(`Player ${this.players[this.currentPlayer]} is not moving (${this.places[this.currentPlayer]})`);
       }
     } else {
       this.places[this.currentPlayer] = this.places[this.currentPlayer] + roll;
       if (this.places[this.currentPlayer] > 11) {
         this.places[this.currentPlayer] = this.places[this.currentPlayer] - 12;
+
+        console.log(`Player ${this.players[this.currentPlayer]} has completed a turn`);
       }
 
       console.log(`Player ${this.players[this.currentPlayer]} is moved to ${this.places[this.currentPlayer]}`);
