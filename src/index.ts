@@ -1,3 +1,5 @@
+import CategoryQuestionSet from "./categoryQuestionSet";
+
 export class Game {
   private players: Array<string> = [];
   private places: Array<number> = [];
@@ -6,18 +8,30 @@ export class Game {
   private currentPlayer: number = 0;
   private isGettingOutOfPenaltyBox: boolean = false;
 
-  private popQuestions: Array<string> = [];
-  private scienceQuestions: Array<string> = [];
-  private sportsQuestions: Array<string> = [];
-  private rockQuestions: Array<string> = [];
+  private popQuestions: CategoryQuestionSet;
+  private scienceQuestions: CategoryQuestionSet;
+  private sportsQuestions: CategoryQuestionSet;
+  private rockQuestions: CategoryQuestionSet;
 
   constructor() {
+    const questions = {
+      pop: [],
+      science: [],
+      sports: [],
+      rock: [],
+    };
     for (let i = 0; i < 50; i++) {
-      this.popQuestions.push("Pop Question " + i);
-      this.scienceQuestions.push("Science Question " + i);
-      this.sportsQuestions.push("Sports Question " + i);
-      this.rockQuestions.push(this.createRockQuestion(i));
+      questions.pop.push("Pop Question " + i);
+      questions.science.push("Science Question " + i);
+      questions.sports.push("Sports Question " + i);
+      questions.rock.push(this.createRockQuestion(i));
     }
+
+    this.popQuestions = new CategoryQuestionSet(...questions.pop);
+    this.scienceQuestions = new CategoryQuestionSet(...questions.science);
+    this.sportsQuestions = new CategoryQuestionSet(...questions.sports);
+    this.rockQuestions = new CategoryQuestionSet(...questions.rock);
+
     console.log("Populate 50 questions over [Pop, Science, Sports, Rock] catergory");
   }
 
@@ -75,10 +89,10 @@ export class Game {
   }
 
   private askQuestion(): void {
-    if (this.currentCategory() == "Pop") console.log(this.popQuestions.shift());
-    if (this.currentCategory() == "Science") console.log(this.scienceQuestions.shift());
-    if (this.currentCategory() == "Sports") console.log(this.sportsQuestions.shift());
-    if (this.currentCategory() == "Rock") console.log(this.rockQuestions.shift());
+    if (this.currentCategory() == "Pop") console.log(this.popQuestions.ask());
+    if (this.currentCategory() == "Science") console.log(this.scienceQuestions.ask());
+    if (this.currentCategory() == "Sports") console.log(this.sportsQuestions.ask());
+    if (this.currentCategory() == "Rock") console.log(this.rockQuestions.ask());
   }
 
   private currentCategory(): string {
