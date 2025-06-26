@@ -1,6 +1,6 @@
 import CategoryQuestionSet from "../categoryQuestionSet";
 
-const ALL_CATEGORIES = ["Pop", "Science", "Sports", "Rock"] as const;
+export const ALL_CATEGORIES = ["Pop", "Science", "Sports", "Rock"] as const;
 export type Category = typeof ALL_CATEGORIES[number];
 
 class AllQuestions {

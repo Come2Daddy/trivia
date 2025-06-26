@@ -1,5 +1,6 @@
 import CategoryQuestionSet from "./categoryQuestionSet";
 import AllQuestions, { Category } from "./allQuestions";
+import Board from "./board";
 
 export class Game {
   private players: Array<string> = [];
@@ -89,20 +90,7 @@ export class Game {
   }
 
   private askQuestion(): void {
-    console.log(this.allQuestions.ask(this.currentCategory() as Category));
-  }
-
-  private currentCategory(): string {
-    if (this.places[this.currentPlayer] == 0) return "Pop";
-    if (this.places[this.currentPlayer] == 4) return "Pop";
-    if (this.places[this.currentPlayer] == 8) return "Pop";
-    if (this.places[this.currentPlayer] == 1) return "Science";
-    if (this.places[this.currentPlayer] == 5) return "Science";
-    if (this.places[this.currentPlayer] == 9) return "Science";
-    if (this.places[this.currentPlayer] == 2) return "Sports";
-    if (this.places[this.currentPlayer] == 6) return "Sports";
-    if (this.places[this.currentPlayer] == 10) return "Sports";
-    return "Rock";
+    console.log(this.allQuestions.ask(Board.getCategory(this.places[this.currentPlayer])));
   }
 
   private didPlayerWin(): boolean {
