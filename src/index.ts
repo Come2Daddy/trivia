@@ -1,4 +1,5 @@
 import CategoryQuestionSet from "./categoryQuestionSet";
+import AllQuestions, { Category } from "./allQuestions";
 
 export class Game {
   private players: Array<string> = [];
@@ -8,10 +9,7 @@ export class Game {
   private currentPlayer: number = 0;
   private isGettingOutOfPenaltyBox: boolean = false;
 
-  private popQuestions: CategoryQuestionSet;
-  private scienceQuestions: CategoryQuestionSet;
-  private sportsQuestions: CategoryQuestionSet;
-  private rockQuestions: CategoryQuestionSet;
+  private allQuestions: AllQuestions;
 
   constructor() {
     const questions = {
@@ -27,10 +25,12 @@ export class Game {
       questions.rock.push(this.createRockQuestion(i));
     }
 
-    this.popQuestions = new CategoryQuestionSet(...questions.pop);
-    this.scienceQuestions = new CategoryQuestionSet(...questions.science);
-    this.sportsQuestions = new CategoryQuestionSet(...questions.sports);
-    this.rockQuestions = new CategoryQuestionSet(...questions.rock);
+    this.allQuestions = new AllQuestions();
+
+    this.allQuestions.addQuestionCategory("Pop", new CategoryQuestionSet(...questions.pop));
+    this.allQuestions.addQuestionCategory("Science", new CategoryQuestionSet(...questions.science));
+    this.allQuestions.addQuestionCategory("Sports", new CategoryQuestionSet(...questions.sports));
+    this.allQuestions.addQuestionCategory("Rock", new CategoryQuestionSet(...questions.rock));
 
     console.log("Populate 50 questions over [Pop, Science, Sports, Rock] catergory");
   }
@@ -89,10 +89,7 @@ export class Game {
   }
 
   private askQuestion(): void {
-    if (this.currentCategory() == "Pop") console.log(this.popQuestions.ask());
-    if (this.currentCategory() == "Science") console.log(this.scienceQuestions.ask());
-    if (this.currentCategory() == "Sports") console.log(this.sportsQuestions.ask());
-    if (this.currentCategory() == "Rock") console.log(this.rockQuestions.ask());
+    console.log(this.allQuestions.ask(this.currentCategory() as Category));
   }
 
   private currentCategory(): string {
