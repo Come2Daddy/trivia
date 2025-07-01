@@ -1,11 +1,11 @@
 import CategoryQuestionSet from "./categoryQuestionSet";
 import AllQuestions, { Category } from "./allQuestions";
 import Board from "./board";
+import Player from "./player";
 
 export class Game {
-  private players: Array<string> = [];
-  private places: Array<number> = [];
-  private purses: Array<number> = [];
+  private players: Array<Player> = [];
+  private places: Array<Board> = [];
   private inPenaltyBox: Array<boolean> = [];
   private currentPlayer: number = 0;
   private isGettingOutOfPenaltyBox: boolean = false;
@@ -41,9 +41,9 @@ export class Game {
   }
 
   public add(name: string) {
-    this.players.push(name);
-    this.places[this.howManyPlayers() - 1] = 0;
-    this.purses[this.howManyPlayers() - 1] = 0;
+    this.players.push(new Player(name));
+    this.places[this.howManyPlayers() - 1] = new Board();
+    //this.purses[this.howManyPlayers() - 1] = 0;
     this.inPenaltyBox[this.howManyPlayers() - 1] = false;
     console.log(`Add player ${name} at place ${this.howManyPlayers() - 1}`);
   }
@@ -58,54 +58,60 @@ export class Game {
       if (roll % 2 != 0) {
         this.isGettingOutOfPenaltyBox = true;
 
-        console.log(`Player ${this.players[this.currentPlayer]} is getting out of penalty box`);
+        console.log(`Player ${this.players[this.currentPlayer].name} is getting out of penalty box`);
 
-        this.places[this.currentPlayer] = this.places[this.currentPlayer] + roll;
-        if (this.places[this.currentPlayer] > 11) {
-          this.places[this.currentPlayer] = this.places[this.currentPlayer] - 12;
+        this.places[this.currentPlayer].move(roll);
 
-          console.log(`Player ${this.players[this.currentPlayer]} has completed a turn out of penalty box`);
-        }
+        if (this.places[this.currentPlayer].hasCompletedTurnOnDisplacement)
+          console.log(`Player ${this.players[this.currentPlayer].name} has completed a turn out of penalty box`);
 
-        console.log(`Player ${this.players[this.currentPlayer]} is moved to ${this.places[this.currentPlayer]}`);
+        console.log(
+          `Player ${this.players[this.currentPlayer].name} is moved to ${this.places[this.currentPlayer].getPosition}`
+        );
 
         this.askQuestion();
       } else {
         this.isGettingOutOfPenaltyBox = false;
-        console.log(`Player ${this.players[this.currentPlayer]} is not getting out of penalty box`);
-        console.log(`Player ${this.players[this.currentPlayer]} is not moving (${this.places[this.currentPlayer]})`);
+        console.log(`Player ${this.players[this.currentPlayer].name} is not getting out of penalty box`);
+        console.log(
+          `Player ${this.players[this.currentPlayer].name} is not moving (${
+            this.places[this.currentPlayer].getPosition
+          })`
+        );
       }
     } else {
-      this.places[this.currentPlayer] = this.places[this.currentPlayer] + roll;
-      if (this.places[this.currentPlayer] > 11) {
-        this.places[this.currentPlayer] = this.places[this.currentPlayer] - 12;
+      this.places[this.currentPlayer].move(roll);
 
-        console.log(`Player ${this.players[this.currentPlayer]} has completed a turn`);
-      }
+      if (this.places[this.currentPlayer].hasCompletedTurnOnDisplacement)
+        console.log(`Player ${this.players[this.currentPlayer].name} has completed a turn`);
 
-      console.log(`Player ${this.players[this.currentPlayer]} is moved to ${this.places[this.currentPlayer]}`);
+      console.log(
+        `Player ${this.players[this.currentPlayer].name} is moved to ${this.places[this.currentPlayer].getPosition}`
+      );
 
       this.askQuestion();
     }
   }
 
   private askQuestion(): void {
-    console.log(this.allQuestions.ask(Board.getCategory(this.places[this.currentPlayer])));
+    console.log(this.allQuestions.ask(Board.getCategory(this.places[this.currentPlayer].getPosition)));
   }
 
   private didPlayerWin(): boolean {
-    return this.purses[this.currentPlayer] == 6;
+    return this.players[this.currentPlayer].hasWon();
   }
 
   public wrongAnswer(): boolean {
     this.inPenaltyBox[this.currentPlayer] = true;
 
-    console.log(`Player ${this.players[this.currentPlayer]} has given a wrong answer and is getting into penalty box`);
+    console.log(
+      `Player ${this.players[this.currentPlayer].name} has given a wrong answer and is getting into penalty box`
+    );
 
     this.currentPlayer += 1;
     if (this.currentPlayer == this.players.length) this.currentPlayer = 0;
 
-    console.log(`Player ${this.players[this.currentPlayer]} turn`);
+    console.log(`Player ${this.players[this.currentPlayer].name} turn`);
     return false;
   }
 
@@ -115,42 +121,42 @@ export class Game {
         this.inPenaltyBox[this.currentPlayer] = false;
 
         console.log(
-          `Player ${this.players[this.currentPlayer]} has given a correct answer and is getting out of penalty box`
+          `Player ${this.players[this.currentPlayer].name} has given a correct answer and is getting out of penalty box`
         );
 
-        this.purses[this.currentPlayer] += 1;
+        this.players[this.currentPlayer].addPoint();
 
-        console.log(`Player ${this.players[this.currentPlayer]} has gained a point`);
+        console.log(`Player ${this.players[this.currentPlayer].name} has gained a point`);
 
         var winner = this.didPlayerWin();
 
-        if (winner) console.log(`Player ${this.players[this.currentPlayer]} has won`);
+        if (winner) console.log(`Player ${this.players[this.currentPlayer].name} has won`);
 
         this.currentPlayer += 1;
         if (this.currentPlayer == this.players.length) this.currentPlayer = 0;
 
-        console.log(`Player ${this.players[this.currentPlayer]} turn`);
+        console.log(`Player ${this.players[this.currentPlayer].name} turn`);
 
         return winner;
       } else {
         this.currentPlayer += 1;
         if (this.currentPlayer == this.players.length) this.currentPlayer = 0;
-        console.log(`Player ${this.players[this.currentPlayer]} turn`);
+        console.log(`Player ${this.players[this.currentPlayer].name} turn`);
         return false;
       }
     } else {
-      this.purses[this.currentPlayer] += 1;
+      this.players[this.currentPlayer].addPoint();
 
-      console.log(`Player ${this.players[this.currentPlayer]} has gained a point`);
+      console.log(`Player ${this.players[this.currentPlayer].name} has gained a point`);
 
       var winner = this.didPlayerWin();
 
-      if (winner) console.log(`Player ${this.players[this.currentPlayer]} has won`);
+      if (winner) console.log(`Player ${this.players[this.currentPlayer].name} has won`);
 
       this.currentPlayer += 1;
       if (this.currentPlayer == this.players.length) this.currentPlayer = 0;
 
-      console.log(`Player ${this.players[this.currentPlayer]} turn`);
+      console.log(`Player ${this.players[this.currentPlayer].name} turn`);
 
       return winner;
     }
